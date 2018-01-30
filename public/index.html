@@ -10,16 +10,7 @@
           Welcome ot the app
     </p>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-    var socket = io();//storing the socket in a variable 
-    // <!-- we are initiating a request from the browser to the server telling it to open a socketIo for us -->
-   socket.on('connect', () => {
-       console.log("we are connected to the server")
-   })
-   socket.on('disconnect',() =>{
-       console.log('the server is down');
-   } )
-   </script>
+    <script src= "/js/index.js"></script>
 </body>
 
 </html>
