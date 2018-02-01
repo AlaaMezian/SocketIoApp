@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const moment = require('moment');
+const isRealString = require('./utils/validation');
 
 const publicPath = path.join(__dirname, '../public');
 var app = express();
@@ -15,17 +16,24 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('new user connected');
-    //this is create the event from server side 
-    socket.emit('newUserMessage', {
-        from: 'Admin',
-        text: 'Welcome to the chat app'
-    })
-    socket.broadcast.emit('newUserMessage',{
-        from : 'Admin',
-        text : 'New User Joined',
-        createdAt: moment().valueOf()
-    })
-  
+
+    socket.on('join', (params, callback) => {
+        if (!isRealString(params.name) || !isRealString(params.room)) {
+            callback('fill all required field')
+        }
+        socket.join(params.room);
+        //this is create the event from server side 
+        socket.emit('newUserMessage', {
+            from: 'Admin',
+            text: 'Welcome to the chat app'
+        })
+        socket.broadcast.to(params.room).emit('newUserMessage', {
+            from: 'Admin',
+            text: 'New User Joined',
+            createdAt: moment().valueOf()
+        })
+        callback();
+    });
     socket.on('createMessage', (message, callback) => {
         console.log("message from the browser", message);
         io.emit('newUserMessage', {
@@ -37,18 +45,18 @@ io.on('connection', (socket) => {
 
     });//the data going to be sent along when the email event occurs 
 
-    socket.on('createLocationMessage', function(coords){
-        io.emit('newLocationMessage',{
-            from:'Admin',
-            url : 'https://www.google.com/maps?q='+ coords.longitude + ","+coords.latitude ,
-            createdAt: new Date().getTime()  
+    socket.on('createLocationMessage', function (coords) {
+        io.emit('newLocationMessage', {
+            from: 'Admin',
+            url: 'https://www.google.com/maps?q=' + coords.longitude + "," + coords.latitude,
+            createdAt: new Date().getTime()
         });
-    }) 
-   
+    })
+
     socket.on('disconnect', () => {
         console.log('user was disconnected');
     })
-    
+
 })
 
 
