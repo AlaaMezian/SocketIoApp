@@ -9,7 +9,7 @@ var server = http.createServer(app);
 var io = socketIO(server); //we are telling the  socket to uwse our server
 
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8000;
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
@@ -25,24 +25,29 @@ io.on('connection', (socket) => {
         createdAt: new Date().getTime()
     })
   
-    socket.on('createMessage', (message) => {
+    socket.on('createMessage', (message, callback) => {
         console.log("message from the browser", message);
-        io.emit('newMessage', {
+        io.emit('newUserMessage', {
             from: message.from,
             text: message.text,
             createAt: new Date().getTime()
         })
+        callback('this is from the server');
 
     });//the data going to be sent along when the email event occurs 
+
+    socket.on('createLocationMessage', function(coords){
+        io.emit('newLocationMessage',{
+            from:'Admin',
+            url : 'https://www.google.com/maps?q='+ coords.longitude + ","+coords.latitude ,
+            createdAt: new Date().getTime()  
+        });
+    }) 
+   
     socket.on('disconnect', () => {
         console.log('user was disconnected');
     })
-
-    // // socket.broadcast.emit('newMessage',{
-        // // from:message.from,
-        // // text:message.text,
-        // // createdAt:new Date().getTime()
-    // // })mean that the user who emited the function won't recive anything even if listining to th event
+    
 })
 
 
@@ -51,5 +56,5 @@ server.listen(port, () => {
 })
 
 //notes 
-//socket .io emmit the event to a single connectio 
+//socket .io emmit the event to a single connection 
 //io.emit emmit the event to  every single connection
