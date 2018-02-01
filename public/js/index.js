@@ -10,23 +10,23 @@ socket.on('disconnect', function () {
     console.log('the server is down');
 });
 socket.on('newUserMessage', function (newMessage) {
-    console.log("new Message", newMessage);
+    var formattedTime=moment(message.createdAt).format('MMM YY, hh:mm a');
     var li = jQuery('<li></li>');
-    li.text(newMessage.from + ":" + newMessage.text)
+    li.text(newMessage.from +" {" + formattedTime+ "}" +":" + newMessage.text)
     jQuery('#message').append(li);
 });
 socket.on('newUserMessage', function (newUserMessage) {
     console.log('welcome message', newUserMessage)
 })
 
-
+var messageTextBox= jQuery('[name=message]');
 jQuery('#message-form').on('submit', function (e) {
     e.preventDefault();//prevent refreshin process
     socket.emit('createMessage', {
         from: 'User',
-        text: jQuery('[name=message]').val()
+        text: messageTextBox.val()
     }, function () {
-        //aknoledgment function
+        messageTextBox.val('')
     });
 });
 
@@ -53,10 +53,11 @@ locationButton.on('click', function () {
 })
 
 socket.on('newLocationMessage', function (message) {
+    var formattedTime=moment(message.createdAt).format('MMM YY, hh:mm a');
     var li = jQuery('<li></li>');
     var a = jQuery('<a target="_blank">My current Location</a>')
     //target blank is used to open the link in new tab
-    li.text(message.from + ":")
+    li.text(message.from +"{"+formattedTime+"}" +":" )
     a.attr('href', message.url)
     li.append(a)
     jQuery('#message').append(li);

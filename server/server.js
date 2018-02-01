@@ -2,6 +2,7 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
+const moment = require('moment');
 
 const publicPath = path.join(__dirname, '../public');
 var app = express();
@@ -9,7 +10,7 @@ var server = http.createServer(app);
 var io = socketIO(server); //we are telling the  socket to uwse our server
 
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 5001;
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
@@ -22,7 +23,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('newUserMessage',{
         from : 'Admin',
         text : 'New User Joined',
-        createdAt: new Date().getTime()
+        createdAt: moment().valueOf()
     })
   
     socket.on('createMessage', (message, callback) => {
@@ -30,7 +31,7 @@ io.on('connection', (socket) => {
         io.emit('newUserMessage', {
             from: message.from,
             text: message.text,
-            createAt: new Date().getTime()
+            createdAt: moment().valueOf()
         })
         callback('this is from the server');
 
