@@ -1,3 +1,3 @@
 # SocketIoApp
 
-real time chat socket application 
+simple real time chat socket application 
